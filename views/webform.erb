@@ -1,0 +1,224 @@
+<html>
+          <title>IP to DHCP Engine</title>
+             <head>
+            <link href='bootstrap.css' rel='stylesheet'>
+             <script type='text/javascript' ng:autobind
+             src='angular-0.9.19.js'></script>
+             <script type='text/javascript' src='jquery.js'></script>
+            <script type='text/javascript'>
+            function selectElement(divContainer) {
+                var selectedIp = divContainer.getAttribute('deviceIp');
+                var deviceType = divContainer.getAttribute('deviceType');
+                document.getElementById('input_host').value = '';
+                document.getElementById('input_description').value = '';
+                document.getElementById('input_ip').value = selectedIp;
+                document.getElementById('nfsprivate').style.display='none';
+                document.getElementById('private').style.display='none';
+                document.getElementById('nfsdmz').style.display='none';
+                document.getElementById('dmz').style.display='none';
+                document.getElementById('fade').style.display='none'
+            }
+            function searchadddel(thecheckbox, thelabel) {
+                var checkboxvar = document.getElementById(thecheckbox);
+                var labelvar = document.getElementById(thelabel);
+                if (!checkboxvar.checked) {
+                    //document.getElementByNames("checkboxes").style.display = "block";
+                    $('.checkboxes').removeClass("hidden")
+                    labelvar.innerHTML = "Editing";
+                }
+                else {
+                    //document.getElementByNames("checkboxes").style.display = "none";
+                    $('.checkboxes').addClass("hidden")
+                    labelvar.innerHTML = "Search";
+                }
+            }
+            </script>
+            </head>
+            <style type='text/css'>
+              body {
+                padding: 100px;
+              }
+              .black_overlay{
+                display: none;
+                position: absolute;
+                top: 0%;
+                left: 0%;
+                width: 100%;
+                height: 100%;
+                background-color: black;
+                z-index:1001;
+                -moz-opacity: 0.8;
+                opacity:.80;
+                filter: alpha(opacity=80);
+            }
+            .white_content {
+              display: none;
+              position: absolute;
+              top: 25%;
+              left: 25%;
+              width: 50%;
+              height: 50%;
+              padding: 16px;
+              background-color: white;
+              z-index:1002;
+              overflow: auto;
+            }
+            .hidden{
+               display:none;
+            }
+              #popUpDiv {
+                  display: none;
+                  position: absolute;
+                  top: 35%;
+                  left: 35%;
+                  width: 30%;
+                  height: 30%;
+                  padding: 16px;
+                  background-color: white;
+                  z-index:1002;
+                  overflow: auto;
+              }
+              #input_device{
+                  width:105px;
+              }
+              #input_environment{
+                  width:120px;
+              }
+
+            </style>
+            <body <%= @errorload %> >
+            <%= @errorstatus %>
+
+            <script type='text/javascript'>
+             // Dependency Injector injects $xhr service
+            function IPController($xhr) {
+              this.$watch('ipaddress', function() {
+              if (angular.isDefined(this.ipaddress)) {
+                var iparr  = this.ipaddress.split('.');
+                var macarr = ['0','0','5','0','5','6','?','?','?','?','?','?']
+                if (angular.isDefined(iparr[0])) {
+                  switch(iparr[0])
+                  {
+                  case '10':
+                    if (angular.isDefined(iparr[1])) {
+                    switch(iparr[1])
+                  {
+                  case '162':
+                    macarr[6] = 2;
+                    break;
+                  case '166':
+                    macarr[6] = 1;
+                    break;
+                  }
+                }
+                break;
+                case '172':
+                  if (angular.isDefined(iparr[1])) {
+                    switch(iparr[1])
+                    {
+                    case '40':
+                      macarr[6] = 0;
+                      break;
+                    case '41':
+                      macarr[6] = 3;
+                      break;
+                    }
+                  }
+                  break;
+                }
+                // Make sure 3rd octet is 0-9
+                if (macarr[6] != '?' && angular.isDefined(iparr[2]))
+                  if(parseInt(iparr[2]) >= 0 && parseInt(iparr[2]) <= 9)
+                    macarr[7] = iparr[2];
+
+                // Make sure 4th is 0-255, pad with 0s
+                if (macarr[7] != '?' && angular.isDefined(iparr[3]))
+                  if(parseInt(iparr[3]) >= 0 && parseInt(iparr[3]) <= 255) {
+                    var d = pad(iparr[3], 4);
+                    for(var i = 0; i < 4; i++)
+                      macarr[8+i] = d[i];
+                  }
+              }
+              this.mac = '';
+              for(var i = 0; i < macarr.length; i++)
+                this.mac = i % 2 == 1 && i != macarr.length - 1 ?
+                  this.mac + macarr[i] + ':' : this.mac + macarr[i];
+              }
+            });
+          }
+          function pad(number, length) {
+          return (number+'').length >= length ?
+            number + '' : pad('0' + number, length);
+          }
+          </script>
+          <div ng:controller='IPController' class='container'>
+            <div style="text-align:right"><a href="/logout">Log Out</a></div>
+            <form action="http://<%= @host %>:<%= @port %><%= @pagereturn %>" method="POST" enctype="multipart/form-data">
+              <div class="row">
+                <div class="form-horizontal span4 ">
+                  <br>
+                  <table border="0" width='930'>
+                    <tbody>
+                    <tr align="center">
+                      <td>Enter a Host Name</td>
+                      <td>&nbsp;Enter a Description</td>
+                      <td>&nbsp;Enter an IP address</td>
+                      <td>Environment</td>
+                      <td><label name="searchadddel" id="searchadddel">Search</label></td>
+                    </tr>
+                    <tr align="center">
+                      <td><input id="input_host" style="height: 30px;" type="text" name="host" /></td>
+                      <td><input id="input_description" style="height: 30px;" type="text" name="description" /></td>
+                      <td><input id="input_ip" style="height: 30px;" type="text" name="ipaddress" /></td>
+                      <td><select id="input_environment" name="environment"> <option value="Production">Production</option> <option value="Development">Development</option><option value="Staging">Staging</option></select></td>
+                      <td><input type="checkbox" checked="yes" name="search" id="search" onclick="searchadddel('search','searchadddel');"></td>
+                      <td><input type='submit'></td>
+                    </tr>
+                    <tr>
+                      <td colspan="5">
+                        <h3>MAC: {{mac}}</h3>
+                        <p>Select an IP from a network below</p>
+                        <a href = 'javascript:void(0)' onclick = "document.getElementById('private').style.display='block';document.getElementById('fade').style.display='block'">Private</a>
+                        <div id="private" class="white_content">
+                          <a href = "javascript:void(0)" onclick = "document.getElementById('private').style.display='none';document.getElementById('fade').style.display='none'">Close Private IPs</a>
+
+                          <%= @private %>
+
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href = 'javascript:void(0)' onclick = "document.getElementById('dmz').style.display='block';document.getElementById('fade').style.display='block'">DMZ</a>
+                        <div id="dmz" class="white_content">
+                          <a href = "javascript:void(0)" onclick = "document.getElementById('dmz').style.display='none';document.getElementById('fade').style.display='none'">Close DMZ IPs</a>
+
+                          <%= @DMZ %>
+
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href = 'javascript:void(0)' onclick = "document.getElementById('nfsprivate').style.display='block';document.getElementById('fade').style.display='block'">NFS Private</a>
+                        <div id="nfsprivate" class="white_content">
+                          <a href = "javascript:void(0)" onclick = "document.getElementById('nfsprivate').style.display='none';document.getElementById('fade').style.display='none'">Close NFS IPs</a>
+
+                          <%= @NFSprivate %>
+
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href = 'javascript:void(0)' onclick = "document.getElementById('nfsdmz').style.display='block';document.getElementById('fade').style.display='block'">NFS DMZ</a>
+                        <div id="nfsdmz" class="white_content">
+                          <a href = "javascript:void(0)" onclick = "document.getElementById('nfsdmz').style.display='none';document.getElementById('fade').style.display='none'">Close NFS DMZ IPs</a>
+
+                          <%= @NFSDMZ %>
+
+                        </div>
+                        <br>
+                        <div id="fade" class="black_overlay"></div>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                  <p>&nbsp;</p>
+                  <p><a href="../subnets">Subnet Control Panel</a></p>
+                  <div class="span8">
+                  <h4>Changing a MAC address on an existing Redhat/Suse system?</h4>
+                  Run this before you shutdown the host:<br>
+                  <code>rm /etc/udev/rules.d/70-persistent-net.rules</code>
+                  </div>
+                </div>
+              </div>
+          </div>

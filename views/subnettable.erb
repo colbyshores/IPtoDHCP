@@ -1,0 +1,43 @@
+<table style="width: 940px;" border="1" align="center">
+  <tbody>
+  <tr>
+    <td align="center"><input type="checkbox" name="checkbox_<%= @counter %>" /></td>
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr>
+    <td rowspan="8">&nbsp;</td>
+    <td>Device</td>
+    <td colspan="2"><input id="input_device" style="height: 30px; width: 274px;" type="text" name="device_<%= @counter %>" value="<%= @device %>" /></td>
+  </tr>
+  <tr>
+    <td>Routing(Optional)</td>
+    <td colspan="2"><input id="input_device" style="height: 30px; width: 274px;" type="text" name="routing_<%= @counter %>" value="<%= @routing %>" /></td>
+  </tr>
+  <tr>
+    <td>Subnet</td>
+    <td colspan="2"><input id="input_subnet" style="height: 30px; width: 274px;" type="text" name="subnet_<%= @counter %>" value="<%= @subnet %>" /></td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td colspan="2"><input id="input_subnet" style="height: 30px; width: 274px;" type="text" name="netmask_<%= @counter %>" value="<%= @netmask %>" /></td>
+  </tr>
+  <tr>
+    <td>Domain(Optional)</td>
+    <td colspan="2"><input id="input_domain" style="height: 30px; width: 274px;" type="text" name="domain_<%= @counter %>" value="<%= @domain %>" /></td>
+  </tr>
+  <tr>
+    <td>MTU (Optional)</td>
+    <td colspan="2"><input id="input_domain" style="height: 30px; width: 274px;" type="text" name="mtu_<%= @counter %>" value="<%= @mtu %>" /></td>
+  </tr>
+  <tr>
+    <td>DNS Servers</td>
+    <td><input id="input_dns1" style="height: 30px; width: 135px;" type="text" name="dns1_<%= @counter %>" value="<%= @dns1 %>" /></td>
+    <td><input id="input_dns2" style="height: 30px; width: 135px;" type="text" name="dns2_<%= @counter %>" value="<%= @dns2 %>" /></td>
+  </tr>
+  <tr>
+    <td>IP Range(Optional)</td>
+    <td><input id="input_range1" style="height: 30px; width: 135px;" type="text" name="iprange1_<%= @counter %>" value="<%= @iprange1 %>" /></td>
+    <td><input id="input_range2" style="height: 30px; width: 135px;" type="text" name="iprange2_<%= @counter %>" value="<%= @iprange2 %>" /></td>
+  </tr>
+  </tbody>
+</table>
