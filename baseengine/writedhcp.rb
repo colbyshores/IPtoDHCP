@@ -4,7 +4,21 @@ def writedhcp
   end
   data = Conf_host.all.order(:hostname)
   #work in progress DHCP Subnet engine
-  dhcphost = subnet
+  if $config[:pxeboot]  #if the pxeboot flag is set in the config then ensure that is witten to the config file
+    dhcphost = "
+      #option definitions common to all supported networks...
+      ddns-update-style interim;
+      ignore client-updates;
+      authoritative;
+      allow booting;
+      allow bootp;
+      allow unknown-clients;
+      filename \"pxelinux.0\";
+  "
+    dhcphost += subnet
+  else
+    dhcphost = subnet
+  end
   data.each do |data|
     dhcphost += "# #{data.device} - #{data.environment}\n"
     dhcphost += "# #{data.description}\n"

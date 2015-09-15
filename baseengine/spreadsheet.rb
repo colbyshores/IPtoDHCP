@@ -5,9 +5,8 @@ class Devicetable
   end
 
   def csshtml
-    html = "<table border='1' cellpadding='0' cellspacing='0' style='width:750px' align='center'>"    
+    html = "<p><table border='1' cellpadding='0' cellspacing='0' style='width:750px' align='center'><div class='container'>"    
     devicedata = Networkdevice.where(device: @device).order(:ipaddress)
-    counter = 0
     divcounter = 0
     divdevice = @device.delete(' ')
     ipsubsetcounter = 0
@@ -17,27 +16,15 @@ class Devicetable
         ipsubsetcounter += 1
       end
       #loop repeat this for ever zone in the zone database
-      if counter == 5
-        #start format table
-        html += "<tr>"
-      end
-      html << "<td align='center'>
-               <div id=\"selectable#{divdevice}_#{divcounter}\" deviceIp='#{devicedata.ipaddress}' onclick=\"selectElement(this)\">
+      html << "<div class=\"ip-select\" id=\"selectable#{divdevice}_#{divcounter}\" deviceIp='#{devicedata.ipaddress}' onclick=\"selectElement(this)\">
                #{devicedata.ipaddress}
-               </div>
-               </td>"
-      if counter == 5
-        #close format table
-        html += "</tr>"
-        counter = 0
-      end if
-      counter += 1
+               </div>"
       divcounter += 1
-      if ipsubsetcounter == 110
+      if ipsubsetcounter == 112
         break
       end
     end
-    html += "</table>"
+    html += "</div></table>"
     return(html)
   end
 end

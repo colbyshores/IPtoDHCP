@@ -6,18 +6,6 @@
              src='angular-0.9.19.js'></script>
              <script type='text/javascript' src='jquery.js'></script>
             <script type='text/javascript'>
-            function selectElement(divContainer) {
-                var selectedIp = divContainer.getAttribute('deviceIp');
-                var deviceType = divContainer.getAttribute('deviceType');
-                document.getElementById('input_host').value = '';
-                document.getElementById('input_description').value = '';
-                document.getElementById('input_ip').value = selectedIp;
-                document.getElementById('nfsprivate').style.display='none';
-                document.getElementById('private').style.display='none';
-                document.getElementById('nfsdmz').style.display='none';
-                document.getElementById('dmz').style.display='none';
-                document.getElementById('fade').style.display='none'
-            }
             function searchadddel(thecheckbox, thelabel) {
                 var checkboxvar = document.getElementById(thecheckbox);
                 var labelvar = document.getElementById(thelabel);
@@ -38,6 +26,14 @@
               body {
                 padding: 100px;
               }
+
+
+             input.macdisplay {
+               display: block;
+               margin: 130px auto;
+               }
+
+
               .black_overlay{
                 display: none;
                 position: absolute;
@@ -50,40 +46,61 @@
                 -moz-opacity: 0.8;
                 opacity:.80;
                 filter: alpha(opacity=80);
-            }
-            .white_content {
-              display: none;
-              position: absolute;
-              top: 25%;
-              left: 25%;
-              width: 50%;
-              height: 50%;
-              padding: 16px;
-              background-color: white;
-              z-index:1002;
-              overflow: auto;
-            }
-            .hidden{
+             }
+             .white_content {
+               display: none;
+               position: absolute;
+               top: 20%;
+               left: 20%;
+               width: 56%;
+               height: 56%;
+               padding: 16px;
+               background-color: white;
+               z-index:1002;
+               overflow: auto;
+             }
+             .hidden{
                display:none;
-            }
-              #popUpDiv {
-                  display: none;
-                  position: absolute;
-                  top: 35%;
-                  left: 35%;
-                  width: 30%;
-                  height: 30%;
-                  padding: 16px;
-                  background-color: white;
-                  z-index:1002;
-                  overflow: auto;
-              }
+             }
+             #popUpDiv {
+               display: none;
+               position: absolute;
+               top: 35%;
+               left: 35%;
+               width: 30%;
+               height: 30%;
+               padding: 16px;
+               background-color: white;
+               z-index:1002;
+               overflow: auto;
+             }
+             
               #input_device{
                   width:105px;
               }
               #input_environment{
                   width:120px;
               }
+
+              .container .ip-select {
+                width: 100px;
+                float: left; 
+                margin: 2px;
+                padding: 5px;
+                border: 1px solid #ccc;
+                text-align: center;
+                cursor: pointer;
+              }
+
+             .container .ip-select:hover{
+               box-shadow: 3px 3px 15px #666;
+               border-color:#2663C0;
+               background: #2663C0;
+               color: #fff;
+               cursor: pointer;
+               zoom: 1;
+             }
+
 
             </style>
             <body <%= @errorload %> >
@@ -132,7 +149,7 @@
                     macarr[7] = iparr[2];
 
                 // Make sure 4th is 0-255, pad with 0s
-                if (macarr[7] != '?' && angular.isDefined(iparr[3]))
+               if (macarr[7] != '?' && angular.isDefined(iparr[3]))
                   if(parseInt(iparr[3]) >= 0 && parseInt(iparr[3]) <= 255) {
                     var d = pad(iparr[3], 4);
                     for(var i = 0; i < 4; i++)
@@ -150,10 +167,22 @@
           return (number+'').length >= length ?
             number + '' : pad('0' + number, length);
           }
+
+          function selectElement(divContainer) {
+              var selectedIp = divContainer.getAttribute('deviceIp');
+              document.getElementById('input_ip').value = selectedIp;
+              angular.element('#input_ip').trigger('change')  //force angular to take in the modfied input after click
+              document.getElementById('nfsprivate').style.display='none';
+              document.getElementById('private').style.display='none';
+              document.getElementById('nfsdmz').style.display='none';
+              document.getElementById('dmz').style.display='none';
+              document.getElementById('fade').style.display='none'
+          }
+
           </script>
           <div ng:controller='IPController' class='container'>
             <div style="text-align:right"><a href="/logout">Log Out</a></div>
-            <form action="http://<%= @host %>:<%= @port %><%= @pagereturn %>" method="POST" enctype="multipart/form-data">
+            <form action="<%= @pagereturn %>" method="POST" enctype="multipart/form-data">
               <div class="row">
                 <div class="form-horizontal span4 ">
                   <br>
@@ -163,14 +192,22 @@
                       <td>Enter a Host Name</td>
                       <td>&nbsp;Enter a Description</td>
                       <td>&nbsp;Enter an IP address</td>
-                      <td>Environment</td>
+                      <td>&nbsp;Environment</td>
+                      <td>&nbsp;Auto MAC</td>
                       <td><label name="searchadddel" id="searchadddel">Search</label></td>
                     </tr>
                     <tr align="center">
                       <td><input id="input_host" style="height: 30px;" type="text" name="host" /></td>
                       <td><input id="input_description" style="height: 30px;" type="text" name="description" /></td>
                       <td><input id="input_ip" style="height: 30px;" type="text" name="ipaddress" /></td>
-                      <td><select id="input_environment" name="environment"> <option value="Production">Production</option> <option value="Development">Development</option><option value="Staging">Staging</option></select></td>
+                      <td><select id="input_environment" style="width: 120px; text-align: center; padding-left: 10%;" name="environment"> <option value="Production">Production</option> <option value="Development">Development</option><option value="Staging">Staging</option></select></td>
+
+                      <td><select onchange="document.getElementById('automac').style.display='block';document.getElementById('fade').style.display='block'" id="input_automac" style="width: 80px; text-align: center; padding-left: 25%;" name="automac"><option value="yes">yes</option><option value="no">no</option></select></td>
+                      <div id="automac" class="white_content">
+                        <a href = "javascript:void(0)" onclick = "document.getElementById('automac').style.display='none';document.getElementById('fade').style.display='none';$('#input_automac').val('yes')">Close Manual MAC Assignment</a>
+                        <input class='macdisplay' id="mac" style="width: 655px; height: 100px; font-size: 75px" type="text" name="mac" />
+                      </div>
+
                       <td><input type="checkbox" checked="yes" name="search" id="search" onclick="searchadddel('search','searchadddel');"></td>
                       <td><input type='submit'></td>
                     </tr>

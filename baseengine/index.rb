@@ -1,9 +1,10 @@
 class ParseData
-  def initialize(hostname, description, ipaddress, environment, search)
+  def initialize(hostname, description, ipaddress, environment, mac, search)
     @hostname = hostname.slice(0..254)
     @description = description.slice(0..254)
     @ipaddress = ipaddress
     @environment = environment.slice(0..16)
+    @automac = mac  #taken from either the hidden field or dynamic field
     @search = search
     @device = ''
   end
@@ -26,6 +27,7 @@ class ParseData
   end
 
   def verifyfields(checkboxstatus)
+
     if @search != 'on'
       errorcodes = ''
       #only poll the ipaddress against ping if the checkping is enabled
@@ -33,11 +35,20 @@ class ParseData
         pingtest = ping(@ipaddress, 2)
       end
 
-      #if macaddress does not fail during processing and it is not empty save the data
-      macaddress = IpToMac(@ipaddress)
-      #if macaddress is able to be calculated then determine device type off IP octets
-      macaddress ? @device = IpToDevice(@ipaddress) : false
-
+      errorstatus = Hash.new
+      if @automac == '00:50:56:??:??:??'
+        #if macaddress does not fail during processing and it is not empty save the data
+        macaddress = false
+      else
+        if @automac =~ /^([0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}$/i  #if macaddress is valid
+           #if macaddress is able to be calculated then determine device type off IP octets
+           macaddress = @automac
+           macaddress ? @device = IpToDevice(@ipaddress) : false
+        else
+           checkboxstatus = false
+           errorstatus[:macaddress] = 'Invalid MAC Address'
+        end
+      end
 
       hostnametest = Conf_host.where("hostname = '#{@hostname}'").first
       if @ipaddress != '' and @hostname != '' and macaddress != false and !macaddress.nil?
@@ -56,7 +67,6 @@ class ParseData
         end
       end
       if !checkboxstatus #!= true
-        errorstatus = Hash.new
         if @hostname == ''
           errorstatus[:hostname] = 'Hostname Empty'
         else
@@ -120,6 +130,7 @@ def destroycheckbox(sorttype)
       #puts datablock.id
       #add the IP address block back to the Network Device Listing
       Networkdevice.create(:ipaddress => datablock.ipaddress, :device => datablock.device)
+
       Conf_host.destroy_all("ipaddress = '#{datablock.ipaddress}'")    #remove the ip address from the second database'
       #return the checkbox status as selected
       retval = true
@@ -147,7 +158,7 @@ def getpage(page)
 end
 
 def postpage(page)
-  updatedb = ParseData.new(params[:host], params[:description], params[:ipaddress], params[:environment], params[:search])
+  updatedb = ParseData.new(params[:host], params[:description], params[:ipaddress], params[:environment], params[:mac], params[:search])
   if params[:search] == 'on'
     #ensure only one field is able queried for search
     if params[:host] != '' and params[:description] != ''
@@ -177,11 +188,6 @@ def postpage(page)
     spreadsheetform(page, updatedb.verifyfields(destroycheckbox(page)))
   end
 end
-
-#error do
-#  @error = request.env['sinatra_error'].name
-#  haml :'500'
-#end
 
 get '/:getpage' do
   case params[:getpage]

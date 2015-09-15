@@ -13,7 +13,7 @@ def getsubnets
             </style>
           </head>
           <body>
-            <form action='http://#{$config[:host]}:#{$config[:port]}/subnets' method='POST' enctype='multipart/form-data'>
+            <form action='/subnets' method='POST' enctype='multipart/form-data'>
               <table border='0'width='940' align='center'>
               <tr>
                <td>
