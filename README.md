@@ -1,5 +1,6 @@
 # IPtoDHCP
 DHCP Daemon front end written in Ruby on the Sinatra framework and ActiveRecord ORM. Keeps track of machine MAC addresses, IP addresses, descriptions, hostnames, devices, and environment. Automatically converts a IP address in to a MAC address to be added to VMWare. It has an open API that can be leveraged by other applications.
+
 Copyright (c) 2015 Colby Shores.
 All rights reserved.
 
