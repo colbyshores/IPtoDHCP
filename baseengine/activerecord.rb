@@ -3,35 +3,16 @@ ActiveRecord::Base.logger.level = 1
 after do
   ActiveRecord::Base.connection.close
 end
+      # The Default uses SQLLite3 however this can connect to a MySQL/MariaDB/PostgresSQL by using variables such as those below   
+      #:adapter => "mysql",
+      #:host => $config[:sqlhost],
+      #:username => $config[:username],
+      #:password => $config[:password],
 
-#accommodate for different database password configuration scenarios
-if $config[:username] != ''
-  if $config[:password] != ''
-    ActiveRecord::Base.establish_connection(
-      :adapter => "mysql",
-      :host => $config[:sqlhost],
-      :database => $config[:databasename],
-      #connect using username and password
-      :username => $config[:username],
-      :password => $config[:password],
-    )
-  else
-    ActiveRecord::Base.establish_connection(
-      :adapter => "mysql",
-      :host => $config[:sqlhost],
-      :database => $config[:databasename],
-      #connect using only username, no password
-      :username => $config[:username],
-    )
-  end
-else
-  ActiveRecord::Base.establish_connection(
-    :adapter => "mysql",
-    :host => $config[:sqlhost],
-    :database => $config[:databasename],
-    #connect only as root
-  )
-end
+ActiveRecord::Base.establish_connection(
+  :adapter => "sqlite3",               #default is sqlite3 but can use MySQL/MariaDB/PostgresSQL
+  :database => "#{$config[:path]}/#{$config[:databasename]}",
+)
 
 class AddSystemSettings < ActiveRecord::Migration
   #UNIQUE KEY to ensure this does not allow duplicate data
