@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ "$(id -u)" != "0" ]; then
+  echo "Sorry, you must use sudo to run the installer first"
+  exit 1
+fi
+yum install -y sqlite-devel
+gem install bundler
+/usr/local/bin/bundler
+cp IPtoDHCP.conf /etc/IPtoDHCP.conf
+echo 'the default IPtoDHCP.conf has been copied to /etc/, feel free to edit it there.'
